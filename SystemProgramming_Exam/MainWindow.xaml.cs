@@ -29,7 +29,6 @@ namespace SystemProgramming_Exam
     public partial class MainWindow : Window
     {
         private RabbitMqMiddlewareBusService middleware = new RabbitMqMiddlewareBusService();
-
         User u = new User();
 
 
