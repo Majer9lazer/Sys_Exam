@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SystemProgramming_Exam.Properties
+namespace App_1.Properties
 {
 
 

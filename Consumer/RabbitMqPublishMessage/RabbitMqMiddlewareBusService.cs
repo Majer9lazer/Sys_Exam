@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
-namespace SystemProgramming_Exam.Logic
+namespace Consumer.RabbitMqPublishMessage
 {
     public class RabbitMqMiddlewareBusService
     {
@@ -37,9 +33,9 @@ namespace SystemProgramming_Exam.Logic
         {
             _connectionFactory = new ConnectionFactory()
             {
-                HostName = "192.168.111.199",
-                UserName = "shag",
-                Password = "shag",
+                HostName = "localhost",
+                UserName = "guest",
+                Password = "guest",
                 VirtualHost = "/"
             };
         }
