@@ -14,7 +14,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="35"></RowDefinition>
             <RowDefinition></RowDefinition>
-            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="50*"></RowDefinition>
         </Grid.RowDefinitions>
         <ListView x:Name="UserInfoListView" Grid.Row="1">
             <ListView.View>
@@ -28,8 +28,9 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <TextBlock Grid.Row="2" Background="AliceBlue" Margin="3" x:Name="ErrorOrSuccesTextBlock" TextWrapping="Wrap"></TextBlock>
-
+        <ScrollViewer Grid.Row="2"  CanContentScroll="True"  VerticalScrollBarVisibility="Visible">
+        <TextBlock Background="AliceBlue" Margin="3" x:Name="ErrorOrSuccesTextBlock" TextWrapping="Wrap" ></TextBlock>
+        </ScrollViewer>
         <Button Grid.Row="0" Content="Get Lucky Couple" HorizontalAlignment="Right" Margin="3" Padding="5" Click="GetLuckyCouple"></Button>
        
     </Grid>

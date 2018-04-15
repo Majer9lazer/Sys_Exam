@@ -37,11 +37,17 @@ namespace DashBoard
                 VirtualHost = "/"
             };
             InitializeComponent();
-            Task.Run(() =>
+            try
             {
-                RunWorkerProcessForSmss("Q2");
-            });
 
+                    RunWorkerProcessForSmss("Q2");
+
+
+            }
+            catch (Exception e)
+            {
+                ErrorOrSuccesTextBlock.Text += e;
+            }
         }
         public static IConnectionFactory ConnectionFactory;
         public void RunWorkerProcessForSmss(string queueName = "smss_to_send")
@@ -110,9 +116,6 @@ namespace DashBoard
                     channel.BasicConsume(queue: queueName,
                         autoAck: false,
                         consumer: consumer);
-
-                    Console.WriteLine(" Press [enter] to exit.");
-
                 }
             }
         }
