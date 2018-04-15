@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using App_ClassLibrary;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -39,10 +40,7 @@ namespace DashBoard
             InitializeComponent();
             try
             {
-
-                    RunWorkerProcessForSmss("Q2");
-
-
+                RunWorkerProcessForSmss("Q2");
             }
             catch (Exception e)
             {
@@ -61,10 +59,7 @@ namespace DashBoard
                     exclusive: false,
                     autoDelete: false,
                     arguments: null);
-                Dispatcher.InvokeAsync(() =>
-                {
-                    ErrorOrSuccesTextBlock.Text += (" [*] Opened Channel\n");
-                });
+                Dispatcher.InvokeAsync(() => { ErrorOrSuccesTextBlock.Text += (" [*] Opened Channel\n"); });
 
 
 
@@ -78,55 +73,59 @@ namespace DashBoard
 
                 var consumer = new EventingBasicConsumer(channel);
 
-                try
+
+                channel.BasicConsume(queue: queueName,
+                    autoAck: true,
+                    consumer: consumer);
+                consumer.Received += (model, ea) =>
                 {
-
-                    consumer.Received += (model, ea) =>
-                    {
-                        var body = ea.Body;
-                        var message = Encoding.UTF8.GetString(body);
-                        var messageDeserialized = JsonConvert.DeserializeObject<User[]>(message);
-                        MessageBox.Show("We ReceivedMessage");
-
-                        channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                        using (StreamWriter sw = new StreamWriter("UserCouple.txt", false))
-                        {
-
-                            sw.Write(JsonConvert.SerializeObject(messageDeserialized));
-                        }
-
-                        if (messageDeserialized.Length == 2)
-                        {
-                            //Console.ForegroundColor = ConsoleColor.Green;
-                            MessageBox.Show($"We have a couple! - {messageDeserialized[0].UserName} and {messageDeserialized[1].UserName} , RandomNumber = {messageDeserialized[0].UserRandomNumber} , 2Random = {messageDeserialized[1].UserRandomNumber}");
-                        }
-
-                    };
-                }
-                catch (Exception e)
-                {
+                    var body = ea.Body;
+                    var message = Encoding.UTF8.GetString(body);
+                    var messageDeserialized = JsonConvert.DeserializeObject<User[]>(message);
                     Dispatcher.InvokeAsync(() =>
                     {
-                        ErrorOrSuccesTextBlock.Text += e;
+                        ErrorOrSuccesTextBlock.Text += "We ReceivedMessage\n";
                     });
 
-                }
-                finally
-                {
-                    channel.BasicConsume(queue: queueName,
-                        autoAck: false,
-                        consumer: consumer);
-                }
+
+                    using (StreamWriter sw = new StreamWriter("UserCouple.txt", false))
+                    {
+
+                        sw.Write(JsonConvert.SerializeObject(messageDeserialized));
+                    }
+
+                    if (messageDeserialized.Length == 2)
+                    {
+                        //Console.ForegroundColor = ConsoleColor.Green;
+                        MessageBox.Show($"We have a couple! - {messageDeserialized[0].UserName} and {messageDeserialized[1].UserName} , RandomNumber = {messageDeserialized[0].UserRandomNumber} , 2Random = {messageDeserialized[1].UserRandomNumber}");
+                    }
+                    else
+                    {
+                        MessageBox.Show("We didnt't have a couple");
+                    }
+                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                };
+
+
+
             }
+
         }
 
         private void GetLuckyCouple(object sender, RoutedEventArgs e)
         {
             try
             {
-                using (StreamReader sr = new StreamReader("UserCouple.txt"))
+                RunWorkerProcessForSmss("Q2");
+
+                Dispatcher.InvokeAsync(delegate { ErrorOrSuccesTextBlock.Text += "Started Process\n"; });
+
+                if (File.Exists("UserCouple.txt"))
                 {
-                    UserInfoListView.ItemsSource = JsonConvert.DeserializeObject<User[]>(sr.ReadToEnd()).ToList();
+                    using (StreamReader sr = new StreamReader("UserCouple.txt"))
+                    {
+                        UserInfoListView.ItemsSource = JsonConvert.DeserializeObject<User[]>(sr.ReadToEnd()).ToList();
+                    }
                 }
             }
             catch (Exception ex)

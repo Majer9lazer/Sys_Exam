@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using App_ClassLibrary;
@@ -67,6 +68,7 @@ namespace Test
                         {
                             //Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine($"We have a couple! - {messageDeserialized[0].UserName} and {messageDeserialized[1].UserName} , RandomNumber = {messageDeserialized[0].UserRandomNumber} , 2Random = {messageDeserialized[1].UserRandomNumber}");
+                            SystemSounds.Beep.Play();
                         }
 
                     };
