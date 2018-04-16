@@ -8,6 +8,7 @@ using Consumer.RabbitMqPublishMessage;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMqMiddlewareBusService = Consumer.RabbitMqPublishMessage.RabbitMqMiddlewareBusService;
 
 
 namespace Consumer
@@ -59,11 +60,7 @@ namespace Consumer
                     var message = Encoding.UTF8.GetString(body);
 
                     var messageDeserialized = JsonConvert.DeserializeObject<User>(message);
-
-                    if (_users.Count <= 5)
-                    {
-                        _users.Add(messageDeserialized);
-                    }
+                    _users.Add(messageDeserialized);
                     if (_users.Count >= 6)
                     {
 
@@ -74,6 +71,8 @@ namespace Consumer
                             {
                                 sw.Write(JsonConvert.SerializeObject(couple));
                                 _toPublishMessageQ2.PublishMessage(couple, "Q2");
+                                _users.Remove(couple[0]);
+                                _users.Remove(couple[1]);
                             }
                             else
                             {
@@ -84,12 +83,8 @@ namespace Consumer
                     }
 
 
-                    Console.WriteLine($" [x] Deserialized object {messageDeserialized}");
-                    Console.WriteLine($" [x] Received {message}");
-                    Console.ForegroundColor = ConsoleColor.Red;
+                 
                     Console.WriteLine($" [x] Operation Completed {message}");
-                    Console.ForegroundColor = ConsoleColor.Green;
-
                     // ReSharper disable once AccessToDisposedClosure
                     channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 };
